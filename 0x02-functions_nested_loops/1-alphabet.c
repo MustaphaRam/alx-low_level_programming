@@ -1,27 +1,17 @@
-#include <stdio.h>
+#include "main.h"
 
 /**
- * main - entrey point
- *
- * Description: function for printalphabet
- *
- * Return: Always 0 (Success)
+* print_alphabet - Starting point
+* Return: Always 0.
 */
 
 void print_alphabet(void)
 {
-	int n = 97;
+	char c;
 
-	while (n < 123)
+	for (c = 'a'; c <= 'z'; c++)
 	{
-		putchar(n);
-		n++;
+		_putchar(c);
 	}
-	putchar('\n');
-}
-
-int main(void)
-{
-	print_alphabet();
-	return (0);
+	_putchar('\n');
 }
