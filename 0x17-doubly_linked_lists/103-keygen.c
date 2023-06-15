@@ -1,45 +1,127 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
-#define KEY_LENGTH 16
+#include <time.h>
 
 /**
- * generate_key - Generates a key based on the given username
- * @username: The username for which to generate the key
- * @key: The buffer to store the generated key
+ * find_big_number - finds the biggest number
+ *
+ * @usrn: username
+ * @len: length of username
+ * Return: the biggest number
  */
-void generate_key(const char *username, char *key)
+int find_big_number(char *usrn, int len)
 {
-	int i;
-	int length = strlen(username);
-	int sum = 0;
+	int ch;
+	int vch;
+	unsigned int rand_num;
 
-	for (i = 0; i < length; i++)
+	ch = *usrn;
+	vch = 0;
+
+	while (vch < len)
 	{
-		sum += username[i];
+		if (ch < usrn[vch])
+			ch = usrn[vch];
+		vch += 1;
 	}
-	snprintf(key, KEY_LENGTH, "%08x%08x", sum, sum ^ 0x1337d00d);
+
+	srand(ch ^ 14);
+	rand_num = rand();
+
+	return (rand_num & 63);
 }
 
 /**
- * main - Entry point of the keygen program
- * @argc: The number of command-line arguments
- * @argv: An array of command-line argument strings
- * Return: 0 on success, 1 on failure
+ * mul_char_user - multiplies each char of username
+ *
+ * @usrn: username
+ * @len: length of username
+ * Return: multiplied char
  */
-int main(int argc, char *argv[])
+int mul_char_user(char *usrn, int len)
 {
-	if (argc != 2)
+	int ch;
+	int vch;
+
+	ch = vch = 0;
+
+	while (vch < len)
 	{
-		printf("Usage: %s username\n", argv[0]);
-		return (1);
+		ch = ch + usrn[vch] * usrn[vch];
+		vch += 1;
 	}
 
-	char key[KEY_LENGTH];
+	return (((unsigned int)ch ^ 239) & 63);
+}
 
-	generate_key(argv[1], key);
+/**
+ * generate_char - generates a random char
+ *
+ * @usrn: username
+ * Return: a random char
+ */
+int generate_char(char *usrn)
+{
+	int ch;
+	int vch;
 
-	printf("%s\n", key);
+	ch = vch = 0;
+
+	while (vch < *usrn)
+	{
+		ch = rand();
+		vch += 1;
+	}
+
+	return (((unsigned int)ch ^ 229) & 63);
+}
+
+/**
+ * main - Entry point
+ *
+ * @argc: arguments count
+ * @argv: arguments vector
+ * Return: Always 0
+ */
+int main(int argc, char **argv)
+{
+	char keygen[7];
+	int len, ch, vch;
+	long alph[] = {
+		0x3877445248432d41, 0x42394530534e6c37, 0x4d6e706762695432,
+		0x74767a5835737956, 0x2b554c59634a474f, 0x71786636576a6d34,
+		0x723161513346655a, 0x6b756f494b646850 };
+	(void) argc;
+
+	for (len = 0; argv[1][len]; len++)
+		;
+	/* ----------- f1 ----------- */
+	keygen[0] = ((char *)alph)[(len ^ 59) & 63];
+	/* ----------- f2 ----------- */
+	ch = vch = 0;
+	while (vch < len)
+	{
+		ch = ch + argv[1][vch];
+		vch = vch + 1;
+	}
+	keygen[1] = ((char *)alph)[(ch ^ 79) & 63];
+	/* ----------- f3 ----------- */
+	ch = 1;
+	vch = 0;
+	while (vch < len)
+	{
+		ch = argv[1][vch] * ch;
+		vch = vch + 1;
+	}
+	keygen[2] = ((char *)alph)[(ch ^ 85) & 63];
+	/* ----------- find_big_number ----------- */
+	keygen[3] = ((char *)alph)[find_big_number(argv[1], len)];
+	/* ----------- mul_char_user ----------- */
+	keygen[4] = ((char *)alph)[mul_char_user(argv[1], len)];
+	/* ----------- generate_char ----------- */
+	keygen[5] = ((char *)alph)[generate_char(argv[1])];
+	keygen[6] = '\0';
+	for (ch = 0; keygen[ch]; ch++)
+		printf("%c", keygen[ch]);
 	return (0);
 }
