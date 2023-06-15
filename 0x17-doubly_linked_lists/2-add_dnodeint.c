@@ -5,7 +5,7 @@
  * @head: Pointer to the head of the list.
  * @n: Value to be assigned to the new node.
  * Return: Address of the new element, or NULL if it failed.
- */
+*/
 dlistint_t *add_dnodeint(dlistint_t **head, const int n)
 {
     dlistint_t *new_node;
@@ -23,5 +23,5 @@ dlistint_t *add_dnodeint(dlistint_t **head, const int n)
 
     *head = new_node;
 
-    return new_node;
+    return (new_node);
 }
